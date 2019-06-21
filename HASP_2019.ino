@@ -43,7 +43,7 @@ void loop() {
   if (current_millis - previous_millis >= INTERVAL_SECONDS * 1000) {
     char eoc_status = get_eoc_status();
     debug_serial.println("[" + String(current_millis) + "]: EOC status: " + String(eoc_status));
-    Serial.println(eoc_status)
+    Serial.println(eoc_status);
     previous_millis = current_millis;
   }
 }
@@ -67,7 +67,7 @@ void read_serial(void)
         break;
       case STATUS_COMMAND:
         debug_serial.println("[" + String(current_millis) + "]: transmitting EOC status: " + String(get_eoc_status()));
-        Serial.println(get_eoc_status())
+        Serial.println(get_eoc_status());
         break;
       default:
         debug_serial.println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
