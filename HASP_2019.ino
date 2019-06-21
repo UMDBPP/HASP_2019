@@ -24,19 +24,21 @@ unsigned long int previous_millis = 0;
 unsigned long int arming_millis = 0;
 bool RELAY_TRIGGERS_ARMED = false;
 bool RELAYS_POWERED = false;
-
-/* make a software serial interface for debugging */
-//SoftwareSerial debug_serial(10, 11);
-HardwareSerial debug_serial = Serial;
+bool DEBUG = false;
 
 void setup() {
-  debug_serial.begin(9600);
-  debug_serial.println("[" + String(millis()) + "]: initializing FISH relay control...");
-
   Serial.begin(1200);
+  
+  if (DEBUG) {
+    Serial.println("[" + String(millis()) + "]: initializing FISH relay control...");
+  }
+
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
+  digitalWrite(CVA_RELAY_PIN_1, LOW);
+  digitalWrite(CVA_RELAY_PIN_2, LOW);
+  digitalWrite(EOC_RELAY_PIN, LOW);
 //  pinMode(EOC_STATUS_PIN, INPUT);
 }
 
@@ -45,7 +47,9 @@ void loop() {
 
   /* disarm relay triggers if timeout is exceeded */
   if (RELAY_TRIGGERS_ARMED && current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000) {
-    debug_serial.println("[" + String(current_millis) + "]: disarming relay triggers due to timeout");
+    if (DEBUG) {
+      Serial.println("[" + String(current_millis) + "]: disarming relay triggers due to timeout");
+    }
   }
 
   /* read the serial buffer and see if anything has come in since the last iteration */
@@ -56,9 +60,11 @@ void loop() {
 
   if (current_millis - previous_millis >= INTERVAL_SECONDS * 1000) {
     String relay_status = get_relay_status();
-    debug_serial.println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
+    if (DEBUG) {     
+      Serial.println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
+    }
+    
     Serial.println(String(current_millis) + ", DAS status: " + relay_status);
-
     previous_millis = current_millis;
   }
 }
@@ -70,9 +76,13 @@ void execute_command(char incoming_command) {
   switch (incoming_command) {
     case COMMAND_ARM:
       if (RELAYS_POWERED) {
-        debug_serial.println("[" + String(current_millis) + "]: relays are already powered");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: relays are already powered");
+        }
       } else {
-        debug_serial.println("[" + String(current_millis) + "]: arming relay triggers for " + String(ARMING_TIMEOUT_SECONDS) + "s");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: arming relay triggers for " + String(ARMING_TIMEOUT_SECONDS) + "s");
+        }
       }
 
       RELAY_TRIGGERS_ARMED = true;
@@ -80,39 +90,59 @@ void execute_command(char incoming_command) {
       break;
     case COMMAND_DISARM:
       if (RELAYS_POWERED) {
-        debug_serial.println("[" + String(current_millis) + "]: switching relays off");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: switching relays off");
+        }
+        
         digitalWrite(CVA_RELAY_PIN_1, LOW);
         digitalWrite(CVA_RELAY_PIN_2, LOW);
         digitalWrite(EOC_RELAY_PIN, LOW);
         RELAYS_POWERED = false;
       } else if (RELAY_TRIGGERS_ARMED) {
-        debug_serial.println("[" + String(current_millis) + "]: disarming relay triggers due to command");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: disarming relay triggers due to command");
+        }
       } else {
-        debug_serial.println("[" + String(current_millis) + "]: relay triggers are not armed");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: relay triggers are not armed");
+        }
       }
 
       RELAY_TRIGGERS_ARMED = false;
       break;
     case COMMAND_RELAYS_ON:
       if (RELAYS_POWERED) {
-        debug_serial.println("[" + String(current_millis) + "]: relays are already on");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: relays are already on");
+        }
       } else if (RELAY_TRIGGERS_ARMED) {
-        debug_serial.println("[" + String(current_millis) + "]: switching relays on");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: switching relays on");
+        }
+        
         digitalWrite(CVA_RELAY_PIN_1, HIGH);
         digitalWrite(CVA_RELAY_PIN_2, HIGH);
         digitalWrite(EOC_RELAY_PIN, HIGH);
       } else {
-        debug_serial.println("[" + String(current_millis) + "]: relay triggers are not armed");
+        if (DEBUG) {     
+          Serial.println("[" + String(current_millis) + "]: relay triggers are not armed");
+        }
       }
 
       break;
     case COMMAND_REQUEST_STATUS:
       relay_status = get_relay_status();
-      debug_serial.println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
+      
+      if (DEBUG) {     
+        Serial.println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
+      }
+      
       Serial.println(String(current_millis) + ", DAS status: " + relay_status);
       break;
     default:
-        debug_serial.println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
+        if (DEBUG) {
+          Serial.println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
+        }
         break;
       }
 }
