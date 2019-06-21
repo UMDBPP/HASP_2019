@@ -1,3 +1,5 @@
+#include <SoftwareSerial.h>
+
 /* pin numbers */
 #define EOC_RELAY_PIN 2
 #define CVA_RELAY_PIN 3
@@ -7,6 +9,10 @@
 #define EOC_RELAY_ON_COMMAND 'O'
 #define CVA_RELAY_ON_COMMAND 'T'
 #define STATUS_COMMAND 'P'
+
+/* outgoing serial messages */
+#define EOC_STATUS_RECORDING_ON 'A'
+#define EOC_STATUS_RECORDING_OFF 'W'
 
 /* seconds between program iterations */
 #define INTERVAL_SECONDS 5
@@ -18,9 +24,13 @@
 unsigned long int current_millis = 0;
 unsigned long int previous_millis = 0;
 
+/* make a software serial interface for debugging */
+SoftwareSerial debug_serial(10, 11);
+
 void setup() {
   Serial.begin(1200);
-  Serial.println("Initializing...");
+  debug_serial.begin(9600);
+  debug_serial.println("Initializing...");
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN, OUTPUT);
   pinMode(EOC_STATUS_PIN, INPUT);
@@ -31,7 +41,9 @@ void loop() {
   read_serial();
 
   if (current_millis - previous_millis >= INTERVAL_SECONDS * 1000) {
-    Serial.print("[" + current_millis + "]: EOC status: " + get_eoc_status());
+    char eoc_status = get_eoc_status();
+    debug_serial.println("[" + String(current_millis) + "]: EOC status: " + String(eoc_status));
+    Serial.println(eoc_status)
     previous_millis = current_millis;
   }
 }
@@ -46,32 +58,29 @@ void read_serial(void)
 
     switch (incoming_command) {
       case EOC_RELAY_ON_COMMAND:
+        debug_serial.println("[" + String(current_millis) + "]: triggering EOC relay");
         digitalWrite(EOC_RELAY_PIN, HIGH);
-        Serial.println("[" + current_millis + "]: triggering EOC relay");
         break;
       case CVA_RELAY_ON_COMMAND:
+        debug_serial.println("[" + String(current_millis) + "]: triggering CVA relay");
         digitalWrite(CVA_RELAY_PIN, HIGH);
-        Serial.println("[" + current_millis + "]: triggering CVA relay");
         break;
       case STATUS_COMMAND:
-        Serial.print("[" + current_millis + "]: EOC status: " + get_eoc_status());
+        debug_serial.println("[" + String(current_millis) + "]: transmitting EOC status: " + String(get_eoc_status()));
+        Serial.println(get_eoc_status())
         break;
       default:
-        Serial.println("[" + current_millis + "]: received unknown command: " + incoming_command);
+        debug_serial.println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
         break;
     }
   }
 }
 
 /* get status of EOC from its status LED: either recording or not recording */
-String get_eoc_status() {
-  String eoc_status;
-
+char get_eoc_status() {
   if (digitalRead(EOC_STATUS_PIN) == HIGH) {
-    eoc_status = "RECORDING";
+    return EOC_STATUS_RECORDING_ON;
   } else {
-    eoc_status = "NOT RECORDING";
+    return EOC_STATUS_RECORDING_OFF;
   }
-
-  return eoc_status;
 }
