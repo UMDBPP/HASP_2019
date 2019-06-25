@@ -5,7 +5,7 @@
 #define DOWNLINK_INTERVAL_SECONDS 5
 
 /* seconds before system disarms after being armed */
-#define ARMING_TIMEOUT_SECONDS 30
+#define ARMING_TIMEOUT_SECONDS 10 //CHANGE TO 30 LATER
 
 /* pin numbers */
 #define EOC_RELAY_PIN 10
@@ -46,8 +46,12 @@ void loop() {
   current_millis = millis();
 
   /* disarm relay triggers if timeout is exceeded */
-  if (RELAY_TRIGGERS_ARMED && current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000) {
+  if ((RELAY_TRIGGERS_ARMED) && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000) && (!RELAYS_POWERED)) {
     debug_println("[" + String(current_millis) + "]: disarming relay triggers due to timeout");
+    RELAY_TRIGGERS_ARMED = false;
+    digitalWrite(CVA_RELAY_PIN_1, LOW);
+    digitalWrite(CVA_RELAY_PIN_2, LOW);
+    digitalWrite(EOC_RELAY_PIN, LOW);
   }
 
   /* read the serial buffer and see if anything has come in since the last iteration */
@@ -80,9 +84,12 @@ void execute_command(char incoming_command) {
       break;
     case COMMAND_DISARM:
       if (RELAYS_POWERED) {
+        debug_println("[" + String(current_millis) + "]: Depowering relays and disarming relay triggers due to command");
+        RELAY_TRIGGERS_ARMED = false;      
         set_relay_power(false);
       } else if (RELAY_TRIGGERS_ARMED) {
         debug_println("[" + String(current_millis) + "]: disarming relay triggers due to command");
+        RELAY_TRIGGERS_ARMED = false;
       } else {
         debug_println("[" + String(current_millis) + "]: relay triggers are not armed");
       }
@@ -95,19 +102,20 @@ void execute_command(char incoming_command) {
       } else if (RELAY_TRIGGERS_ARMED) {
         set_relay_power(true);
       } else {
-        debug_println("[" + String(current_millis) + "]: relay triggers are not armed");
+        debug_println("[" + String(current_millis) + "]: ERROR - relay triggers are not armed");
       }
+
       break;
     case COMMAND_REQUEST_STATUS:
       {
         String relay_status = get_relay_status();
         debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
         Serial.println(String(current_millis) + ", DAS status: " + relay_status);
+        break;
       }
-      break;
-    default:
-      debug_println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
-      break;
+    //default:
+      //debug_println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
+      //break;
   }
 }
 
