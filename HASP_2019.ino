@@ -1,5 +1,3 @@
-#include <SoftwareSerial.h>
-
 /* whether to print debug messages to serial */
 #define DEBUG true
 
