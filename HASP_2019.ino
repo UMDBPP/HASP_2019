@@ -97,15 +97,14 @@ void execute_command(char incoming_command) {
       } else {
         debug_println("[" + String(current_millis) + "]: relay triggers are not armed");
       }
-
       break;
     case COMMAND_REQUEST_STATUS:
       {
         String relay_status = get_relay_status();
         debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
         Serial.println(String(current_millis) + ", DAS status: " + relay_status);
-        break;
       }
+      break;
     default:
       debug_println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
       break;
