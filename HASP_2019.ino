@@ -133,7 +133,7 @@ void execute_command(char incoming_command) {
       break;
     case COMMAND_REQUEST_STATUS:
       {
-        String get_relay_status();
+        String relay_status = get_relay_status();
 
         if (DEBUG) {
           Serial.println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
