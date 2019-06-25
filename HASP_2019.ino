@@ -37,10 +37,9 @@ void setup() {
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
-  digitalWrite(CVA_RELAY_PIN_1, LOW);
-  digitalWrite(CVA_RELAY_PIN_2, LOW);
-  digitalWrite(EOC_RELAY_PIN, LOW);
   //  pinMode(EOC_STATUS_PIN, INPUT);
+
+  set_relay_power(false);
 }
 
 void loop() {
@@ -81,12 +80,7 @@ void execute_command(char incoming_command) {
       break;
     case COMMAND_DISARM:
       if (RELAYS_POWERED) {
-        debug_println("[" + String(current_millis) + "]: switching relays off");
-
-        digitalWrite(CVA_RELAY_PIN_1, LOW);
-        digitalWrite(CVA_RELAY_PIN_2, LOW);
-        digitalWrite(EOC_RELAY_PIN, LOW);
-        RELAYS_POWERED = false;
+        set_relay_power(false);
       } else if (RELAY_TRIGGERS_ARMED) {
         debug_println("[" + String(current_millis) + "]: disarming relay triggers due to command");
       } else {
@@ -99,11 +93,7 @@ void execute_command(char incoming_command) {
       if (RELAYS_POWERED) {
         debug_println("[" + String(current_millis) + "]: relays are already on");
       } else if (RELAY_TRIGGERS_ARMED) {
-        debug_println("[" + String(current_millis) + "]: switching relays on");
-        
-        digitalWrite(CVA_RELAY_PIN_1, HIGH);
-        digitalWrite(CVA_RELAY_PIN_2, HIGH);
-        digitalWrite(EOC_RELAY_PIN, HIGH);
+        set_relay_power(true);
       } else {
         debug_println("[" + String(current_millis) + "]: relay triggers are not armed");
       }
@@ -112,15 +102,30 @@ void execute_command(char incoming_command) {
     case COMMAND_REQUEST_STATUS:
       {
         String relay_status = get_relay_status();
-
         debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
-
         Serial.println(String(current_millis) + ", DAS status: " + relay_status);
         break;
       }
     default:
       debug_println("[" + String(current_millis) + "]: received unknown command: " + String(incoming_command));
       break;
+  }
+}
+
+/* control power to relays */
+void set_relay_power(bool power) {
+  if (power) {
+    debug_println("[" + String(current_millis) + "]: switching relays on");
+    digitalWrite(CVA_RELAY_PIN_1, HIGH);
+    digitalWrite(CVA_RELAY_PIN_2, HIGH);
+    digitalWrite(EOC_RELAY_PIN, HIGH);
+    RELAYS_POWERED = true;
+  } else {
+    debug_println("[" + String(current_millis) + "]: switching relays off");
+    digitalWrite(CVA_RELAY_PIN_1, LOW);
+    digitalWrite(CVA_RELAY_PIN_2, LOW);
+    digitalWrite(EOC_RELAY_PIN, LOW);
+    RELAYS_POWERED = false;
   }
 }
 
