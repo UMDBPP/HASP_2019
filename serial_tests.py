@@ -15,10 +15,6 @@ BAUD_RATE = 1200
 
 
 class TestHASPSerial(unittest.TestCase):
-    def test_connection(self):
-        ports = serial.tools.list_ports.comports()
-        self.assertGreater(len(ports), 0)
-
     def test_status_request(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
