@@ -11,13 +11,11 @@ import serial
 from serial.tools import list_ports
 
 
-class HASPSerialTest(unittest.TestCase):
-    def __init__(self, serial_port: str = None):
-        super().__init__()
-        self.serial_port = serial_port if serial_port is not None else next_open_port()
-
+class TestHASPSerial(unittest.TestCase):
     def test_status_request(self):
-        with serial.Serial(port=self.serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        serial_port = next_open_port()
+
+        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # rvalidate that the status request command will return the status
             serial_connection.write('P')
@@ -26,7 +24,9 @@ class HASPSerialTest(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_disarming_sequence(self):
-        with serial.Serial(port=self.serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        serial_port = next_open_port()
+
+        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             serial_connection.write('A')
@@ -45,7 +45,9 @@ class HASPSerialTest(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_activation_sequence(self):
-        with serial.Serial(port=self.serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        serial_port = next_open_port()
+
+        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             serial_connection.write('T')
@@ -72,7 +74,9 @@ class HASPSerialTest(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_regular_status_updates(self):
-        with serial.Serial(port=self.serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        serial_port = next_open_port()
+
+        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             counter = 0
             number_of_iterations = 3
