@@ -10,7 +10,7 @@ It utilizes a [DTS Slice Micro](https://www.dtsweb.com/slice-micro-daq/) to reco
 #### Testing
 
 Python unit tests for the Arduino controller are provided in the `serial_tests.py` file. 
-To run these tests, follow these steps:
+To run these tests, you will need to install both the [Arduino IDE](https://www.arduino.cc/en/Main/Software) and [Python](https://www.python.org/downloads/). Then, follow these steps:
 
 1. upload the provided Arduino sketch (`HASP_2019.ino`) to an Arduino Uno
 2. open a command line and `cd` to the location on your computer where you cloned this repository
