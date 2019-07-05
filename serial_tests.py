@@ -10,6 +10,8 @@ import unittest
 import serial
 from serial.tools import list_ports
 
+SERIAL_PORT = 'ttyUSB01'
+
 
 class TestHASPSerial(unittest.TestCase):
     def test_connection(self):
@@ -17,9 +19,7 @@ class TestHASPSerial(unittest.TestCase):
         self.assertGreater(len(ports), 0)
 
     def test_status_request(self):
-        serial_port = next_open_port()
-
-        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
             serial_connection.write('P')
@@ -28,9 +28,7 @@ class TestHASPSerial(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_disarming_sequence(self):
-        serial_port = next_open_port()
-
-        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             serial_connection.write('A')
@@ -49,9 +47,7 @@ class TestHASPSerial(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_activation_sequence(self):
-        serial_port = next_open_port()
-
-        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             serial_connection.write('T')
@@ -76,24 +72,6 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             received_data = serial_connection.read()
             self.assertIn('DAS status: OFF', received_data)
-
-    def test_regular_status_updates(self):
-        serial_port = next_open_port()
-
-        with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
-                           timeout=1) as serial_connection:
-            counter = 0
-            number_of_iterations = 3
-
-            # validate that the system sends its status umprompted once every 5 seconds
-            for interval in range(number_of_iterations):
-                time.sleep(5)
-                received_data = serial_connection.read()
-
-                if 'DAS status: OFF' in received_data:
-                    counter += 1
-
-            self.assertEqual(number_of_iterations, counter)
 
 
 def open_ports() -> str:
