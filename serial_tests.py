@@ -10,7 +10,8 @@ import unittest
 import serial
 from serial.tools import list_ports
 
-SERIAL_PORT = 'ttyUSB01'
+SERIAL_PORT = '/dev/cu.usbmodem14101'
+BAUD_RATE = 1200
 
 
 class TestHASPSerial(unittest.TestCase):
@@ -19,7 +20,7 @@ class TestHASPSerial(unittest.TestCase):
         self.assertGreater(len(ports), 0)
 
     def test_status_request(self):
-        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
             serial_connection.write('P')
@@ -28,7 +29,7 @@ class TestHASPSerial(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_disarming_sequence(self):
-        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             serial_connection.write('A')
@@ -47,7 +48,7 @@ class TestHASPSerial(unittest.TestCase):
             self.assertIn('DAS status: OFF', received_data)
 
     def test_activation_sequence(self):
-        with serial.Serial(port=SERIAL_PORT, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
+        with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             serial_connection.write('T')
