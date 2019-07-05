@@ -12,12 +12,16 @@ from serial.tools import list_ports
 
 
 class TestHASPSerial(unittest.TestCase):
+    def test_connection(self):
+        ports = serial.tools.list_ports.comports()
+        self.assertGreater(len(ports), 0)
+
     def test_status_request(self):
         serial_port = next_open_port()
 
         with serial.Serial(port=serial_port, baudrate=1200, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
-            # rvalidate that the status request command will return the status
+            # validate that the status request command will return the status
             serial_connection.write('P')
             time.sleep(0.25)
             received_data = serial_connection.read()
