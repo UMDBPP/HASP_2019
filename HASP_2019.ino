@@ -1,5 +1,5 @@
 /* whether to print debug messages to serial */
-#define DEBUG true
+#define DEBUG false
 
 /* seconds between status downlinks */
 #define DOWNLINK_INTERVAL_SECONDS 5
