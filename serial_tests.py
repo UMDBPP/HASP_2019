@@ -24,26 +24,25 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             received_data = serial_connection.readline()
             print(received_data)
-            self.assertIn('DAS status: OFF', str(received_data))
+            assert 'DAS status: OFF' in str(received_data)
 
     def test_arming_sequence(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
-            time.sleep(2)
+            time.sleep(0.25)
             serial_connection.write(str.encode('A'))
             time.sleep(0.25)
             serial_connection.write(str.encode('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
-            self.assertIn('DAS status: ARMED', str(received_data))
+            assert 'DAS status: ARMED' in str(received_data)
 
     def test_disarming_sequence(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command disarms an armed system
-            time.sleep(2)
+            time.sleep(0.25)
             serial_connection.write(str.encode('A'))
             time.sleep(0.25)
             serial_connection.write(str.encode('D'))
@@ -51,14 +50,13 @@ class TestHASPSerial(unittest.TestCase):
             serial_connection.write(str.encode('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
-            self.assertIn('DAS status: OFF', str(received_data))
+            assert 'DAS status: OFF' in str(received_data)
 
     def test_faulty_trigger_sequence(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
-            time.sleep(2)
+            time.sleep(0.25)
             serial_connection.write(str.encode('D'))
             time.sleep(0.25)
             serial_connection.write(str.encode('T'))
@@ -66,13 +64,13 @@ class TestHASPSerial(unittest.TestCase):
             serial_connection.write(str.encode('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
-            self.assertIn('DAS status: OFF', str(received_data))
+            assert 'DAS status: OFF' in str(received_data)
+
     def test_activation_sequence(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command activates an armed system
-            time.sleep(2)
+            time.sleep(0.25)
             serial_connection.write(str.encode('A'))
             time.sleep(0.25)
             serial_connection.write(str.encode('T'))
@@ -81,19 +79,19 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             received_data = serial_connection.readline()
             print(received_data)
-            self.assertIn('DAS status: ACTIVE', str(received_data))
+            assert 'DAS status: ACTIVE' in str(received_data)
+
     def test_dearm_from_active_sequence(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command deactivates an active system
-            time.sleep(1.5)
+            time.sleep(0.25)
             serial_connection.write(str.encode('D'))
             time.sleep(0.25)
             serial_connection.write(str.encode('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
-            self.assertIn('DAS status: OFF', str(received_data))
+            assert 'DAS status: OFF' in str(received_data)
 
 
 def open_ports() -> str:
