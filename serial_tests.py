@@ -22,7 +22,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(1)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: OFF' in received_message
 
@@ -35,7 +35,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: ARMED' in received_message
 
@@ -45,7 +45,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: OFF' in received_message
 
@@ -58,7 +58,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: OFF' in received_message
 
@@ -73,7 +73,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: ACTIVE' in received_message
 
@@ -92,7 +92,7 @@ class TestHASPSerial(unittest.TestCase):
             time.sleep(0.25)
             serial_connection.write(b'P')
             time.sleep(0.25)
-            received_message = str(serial_connection.readline(), encoding='UTF-8')
+            received_message = str(serial_connection.readline(), encoding='ASCII')
 
             assert 'DAS status: OFF' in received_message
 
