@@ -20,9 +20,9 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
             time.sleep(1)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: OFF' in received_message
 
     def test_arming(self):
@@ -30,26 +30,26 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             time.sleep(1)
-            serial_connection.write(bytes('A'))
+            serial_connection.write('A'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: ARMED' in received_message
-            serial_connection.write(bytes('D'))
+            serial_connection.write('D'.encode())
 
     def test_disarming(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command disarms an armed system
             time.sleep(1)
-            serial_connection.write(bytes('A'))
+            serial_connection.write('A'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('D'))
+            serial_connection.write('D'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: OFF' in received_message
 
     def test_disarmed_activation(self):
@@ -57,11 +57,11 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             time.sleep(1)
-            serial_connection.write(bytes('T'))
+            serial_connection.write('T'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: OFF' in received_message
 
     def test_activation(self):
@@ -69,30 +69,30 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the activation command activates an armed system
             time.sleep(1)
-            serial_connection.write(bytes('A'))
+            serial_connection.write('A'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('T'))
+            serial_connection.write('T'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: ACTIVE' in received_message
-            serial_connection.write(bytes('D'))
+            serial_connection.write('D'.encode())
 
     def test_deactivation(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command deactivates an active system
             time.sleep(1)
-            serial_connection.write(bytes('A'))
+            serial_connection.write('A'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('T'))
+            serial_connection.write('T'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('D'))
+            serial_connection.write('D'.encode())
             time.sleep(0.25)
-            serial_connection.write(bytes('P'))
+            serial_connection.write('P'.encode())
             time.sleep(0.25)
-            received_message = str(serial_connection.readline())
+            received_message = serial_connection.readline().decode()
             assert 'DAS status: OFF' in received_message
 
 
