@@ -19,7 +19,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
-            time.sleep(2)
+            time.sleep(1)
             serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
@@ -29,7 +29,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
-            time.sleep(0.25)
+            time.sleep(1)
             serial_connection.write(bytes('A'))
             time.sleep(0.25)
             serial_connection.write(bytes('P'))
@@ -41,7 +41,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command disarms an armed system
-            time.sleep(0.25)
+            time.sleep(1)
             serial_connection.write(bytes('A'))
             time.sleep(0.25)
             serial_connection.write(bytes('D'))
@@ -55,7 +55,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
-            time.sleep(0.25)
+            time.sleep(1)
             serial_connection.write(bytes('D'))
             time.sleep(0.25)
             serial_connection.write(bytes('T'))
@@ -69,7 +69,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command activates an armed system
-            time.sleep(0.25)
+            time.sleep(1)
             serial_connection.write(bytes('A'))
             time.sleep(0.25)
             serial_connection.write(bytes('T'))
@@ -83,7 +83,7 @@ class TestHASPSerial(unittest.TestCase):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the disarming command deactivates an active system
-            time.sleep(0.25)
+            time.sleep(1)
             serial_connection.write(bytes('D'))
             time.sleep(0.25)
             serial_connection.write(bytes('P'))
