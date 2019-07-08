@@ -2,7 +2,7 @@
 #define VERBOSE false
 
 /* seconds between status downlinks */
-#define DOWNLINK_INTERVAL_SECONDS 5
+#define DOWNLINK_INTERVAL_SECONDS 60
 
 /* seconds before system disarms after being armed */
 #define ARMING_TIMEOUT_SECONDS 10 // TODO this should be set to 30 seconds for the flight
@@ -81,6 +81,8 @@ void execute_command(char incoming_command) {
 
       RELAY_TRIGGERS_ARMED = true;
       arming_millis = current_millis;
+
+      send_relay_status();
       break;
     case COMMAND_DISARM:
       if (RELAYS_POWERED) {
@@ -94,6 +96,7 @@ void execute_command(char incoming_command) {
         debug_println("[" + String(current_millis) + "]: unexpected input - relay triggers are not armed");
       }
 
+      send_relay_status();
       break;
     case COMMAND_RELAYS_ON:
       if (RELAYS_POWERED) {
@@ -104,18 +107,22 @@ void execute_command(char incoming_command) {
         debug_println("[" + String(current_millis) + "]: unexpected input - relay triggers are not armed");
       }
 
+      send_relay_status();
       break;
     case COMMAND_REQUEST_STATUS:
-      {
-        String relay_status = get_relay_status();
-        debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
-        Serial.println(String(current_millis) + ", DAS status: " + relay_status);
-      }
+      send_relay_status();
       break;
     //default:
       //debug_println("[" + String(current_millis) + "]: unexpected input - received unknown command: " + String(incoming_command));
       //break;
   }
+}
+
+/* send relay status over serial */
+void send_relay_status() {
+  String relay_status = get_relay_status();
+  debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
+  Serial.println(String(current_millis) + ", DAS status: " + relay_status);
 }
 
 /* control power to relays */
