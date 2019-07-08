@@ -1,5 +1,5 @@
-/* whether to print debug messages to serial */
-#define DEBUG false
+/* whether to print verbose debugging messages to serial */
+#define VERBOSE false
 
 /* seconds between status downlinks */
 #define DOWNLINK_INTERVAL_SECONDS 5
@@ -149,7 +149,7 @@ String get_relay_status() {
 
 /* print to serial if debugging verbosity is enabled */
 void debug_println(String message) {
-  if (DEBUG) {
+  if (VERBOSE) {
     Serial.println(message);
   }
 }
