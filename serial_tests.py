@@ -20,10 +20,9 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
             time.sleep(2)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
             assert 'DAS status: OFF' in str(received_data)
 
     def test_arming_sequence(self):
@@ -31,9 +30,9 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             time.sleep(0.25)
-            serial_connection.write(str.encode('A'))
+            serial_connection.write(bytes('A'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
             assert 'DAS status: ARMED' in str(received_data)
@@ -43,11 +42,11 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the disarming command disarms an armed system
             time.sleep(0.25)
-            serial_connection.write(str.encode('A'))
+            serial_connection.write(bytes('A'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('D'))
+            serial_connection.write(bytes('D'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
             assert 'DAS status: OFF' in str(received_data)
@@ -57,11 +56,11 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             time.sleep(0.25)
-            serial_connection.write(str.encode('D'))
+            serial_connection.write(bytes('D'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('T'))
+            serial_connection.write(bytes('T'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
             assert 'DAS status: OFF' in str(received_data)
@@ -71,14 +70,13 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the activation command activates an armed system
             time.sleep(0.25)
-            serial_connection.write(str.encode('A'))
+            serial_connection.write(bytes('A'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('T'))
+            serial_connection.write(bytes('T'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
-            print(received_data)
             assert 'DAS status: ACTIVE' in str(received_data)
 
     def test_dearm_from_active_sequence(self):
@@ -86,9 +84,9 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the disarming command deactivates an active system
             time.sleep(0.25)
-            serial_connection.write(str.encode('D'))
+            serial_connection.write(bytes('D'))
             time.sleep(0.25)
-            serial_connection.write(str.encode('P'))
+            serial_connection.write(bytes('P'))
             time.sleep(0.25)
             received_data = serial_connection.readline()
             assert 'DAS status: OFF' in str(received_data)
