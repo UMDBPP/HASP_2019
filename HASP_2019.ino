@@ -2,7 +2,7 @@
 #define VERBOSE false
 
 /* seconds between status downlinks */
-#define DOWNLINK_INTERVAL_SECONDS 60
+#define AUTODOWNLINK_INTERVAL_SECONDS 60
 
 /* seconds before system disarms after being armed */
 #define ARMING_TIMEOUT_SECONDS 10 // TODO this should be set to 30 seconds for the flight
@@ -11,7 +11,6 @@
 #define EOC_RELAY_PIN 10
 #define CVA_RELAY_PIN_1 11
 #define CVA_RELAY_PIN_2 12
-//#define EOC_STATUS_PIN 13
 
 /* incoming serial messages */
 #define COMMAND_ARM 'A'
@@ -37,7 +36,6 @@ void setup() {
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
-  //  pinMode(EOC_STATUS_PIN, INPUT);
 
   set_relay_power(false);
 }
@@ -48,10 +46,8 @@ void loop() {
   /* disarm relay triggers if timeout is exceeded */
   if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
     debug_println("[" + String(current_millis) + "]: disarming relay triggers due to timeout");
-    digitalWrite(CVA_RELAY_PIN_1, LOW);
-    digitalWrite(CVA_RELAY_PIN_2, LOW);
-    digitalWrite(EOC_RELAY_PIN, LOW);
-    RELAY_TRIGGERS_ARMED = false;
+    
+    set_relay_power(false);
   }
 
   /* read the serial buffer and see if anything has come in since the last iteration */
@@ -60,7 +56,7 @@ void loop() {
     execute_command(incoming_command);
   }
 
-  if (current_millis - previous_millis >= DOWNLINK_INTERVAL_SECONDS * 1000) {
+  if (current_millis - previous_millis >= AUTODOWNLINK_INTERVAL_SECONDS * 1000) {
     String relay_status = get_relay_status();
     debug_println("[" + String(current_millis) + "]: transmitting relay status: " + relay_status);
 
@@ -112,9 +108,6 @@ void execute_command(char incoming_command) {
     case COMMAND_REQUEST_STATUS:
       send_relay_status();
       break;
-    //default:
-      //debug_println("[" + String(current_millis) + "]: unexpected input - received unknown command: " + String(incoming_command));
-      //break;
   }
 }
 
@@ -144,7 +137,6 @@ void set_relay_power(bool power) {
 
 /* get status of relays */
 String get_relay_status() {
-  // if (digitalRead(EOC_STATUS_PIN) == HIGH) {
   if (RELAYS_POWERED) {
     return "ACTIVE";
   } else if (RELAY_TRIGGERS_ARMED) {
