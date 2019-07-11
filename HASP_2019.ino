@@ -13,10 +13,10 @@
 #define CVA_RELAY_PIN_2 12
 
 /* incoming serial messages */
+#define COMMAND_REQUEST_STATUS 'P'
 #define COMMAND_ARM 'A'
 #define COMMAND_DISARM 'D'
 #define COMMAND_ACTIVATE_RELAYS 'T'
-#define COMMAND_REQUEST_STATUS 'P'
 
 /* baud rate of HASP serial interface */
 #define HASP_BAUD_RATE 1200
@@ -48,6 +48,9 @@ void loop() {
     char incoming_command = Serial.read();
     /* perform task given a char command code */
     switch (incoming_command) {
+      case COMMAND_REQUEST_STATUS:
+        send_relay_status();
+        break;
       case COMMAND_ARM:
         if (RELAYS_POWERED) {
           debug_message("relays are already powered");
@@ -78,9 +81,6 @@ void loop() {
         } else {
           debug_message("unexpected input - relay triggers are not armed");
         }
-        send_relay_status();
-        break;
-      case COMMAND_REQUEST_STATUS:
         send_relay_status();
         break;
     }
