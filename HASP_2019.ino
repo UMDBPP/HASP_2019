@@ -36,7 +36,6 @@ void setup() {
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
 
-  set_relay_power(false);
   send_relay_status();
 }
 
