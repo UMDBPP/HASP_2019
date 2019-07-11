@@ -38,7 +38,6 @@ void setup() {
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
   pinMode(EOC_STATUS_PIN, INPUT);
 
-  set_relay_power(false);
   send_relay_status();
 }
 
@@ -55,12 +54,12 @@ void loop() {
         break;
       case COMMAND_ARM:
         if (RELAYS_POWERED) {
-          debug_message("relays are already powered");
+          debug_message("relays are already on");
         } else {
           debug_message("arming relay triggers for " + String(ARMING_TIMEOUT_SECONDS) + "s");
+          RELAY_TRIGGERS_ARMED = true;
+          arming_millis = current_millis;
         }
-        RELAY_TRIGGERS_ARMED = true;
-        arming_millis = current_millis;
         send_relay_status();
         break;
       case COMMAND_DISARM:
@@ -71,7 +70,7 @@ void loop() {
           debug_message("disarming relay triggers due to command");
           RELAY_TRIGGERS_ARMED = false;
         } else {
-          debug_message("unexpected input - relay triggers are not armed");
+          debug_message("relay triggers are already disarmed");
         }
         send_relay_status();
         break;
@@ -81,7 +80,7 @@ void loop() {
         } else if (RELAY_TRIGGERS_ARMED) {
           set_relay_power(true);
         } else {
-          debug_message("unexpected input - relay triggers are not armed");
+          debug_message("relay triggers are not armed");
         }
         send_relay_status();
         break;
@@ -90,7 +89,7 @@ void loop() {
     /* disarm relay triggers if the time since arming exceeds the timeout */
     if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
       debug_message("disarming relay triggers due to timeout");
-      set_relay_power(false);
+      RELAY_TRIGGERS_ARMED = false;
       send_relay_status();
     }
 
