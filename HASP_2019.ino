@@ -56,9 +56,9 @@ void loop() {
           debug_message("relays are already powered");
         } else {
           debug_message("arming relay triggers for " + String(ARMING_TIMEOUT_SECONDS) + "s");
+          RELAY_TRIGGERS_ARMED = true;
+          arming_millis = current_millis;
         }
-        RELAY_TRIGGERS_ARMED = true;
-        arming_millis = current_millis;
         send_relay_status();
         break;
       case COMMAND_DISARM:
@@ -88,7 +88,7 @@ void loop() {
     /* disarm relay triggers if the time since arming exceeds the timeout */
     if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
       debug_message("disarming relay triggers due to timeout");
-      set_relay_power(false);
+      RELAY_TRIGGERS_ARMED = false;
       send_relay_status();
     }
 
