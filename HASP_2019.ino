@@ -11,7 +11,7 @@
 #define EOC_RELAY_PIN 10
 #define CVA_RELAY_PIN_1 11
 #define CVA_RELAY_PIN_2 12
-//#define EOC_STATUS_PIN 13
+#define EOC_STATUS_PIN 13
 
 /* incoming serial messages */
 #define COMMAND_ARM 'A'
@@ -37,7 +37,7 @@ void setup() {
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
-  //  pinMode(EOC_STATUS_PIN, INPUT);
+  pinMode(EOC_STATUS_PIN, INPUT);
 
   set_relay_power(false);
 }
@@ -144,7 +144,14 @@ void set_relay_power(bool power) {
 
 /* get status of relays */
 String get_relay_status() {
-  // if (digitalRead(EOC_STATUS_PIN) == HIGH) {
+  /* correct internal / external state discrepancy */
+  if (digitalRead(EOC_STATUS_PIN) == HIGH && !RELAYS_POWERED) {
+    RELAYS_POWERED = true;
+  } else if (digitalRead(EOC_STATUS_PIN) == LOW && RELAYS_POWERED) {
+    RELAYS_POWERED = false;
+  }
+
+  /* return string indicating relay power state */
   if (RELAYS_POWERED) {
     return "ACTIVE";
   } else if (RELAY_TRIGGERS_ARMED) {
