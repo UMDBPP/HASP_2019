@@ -121,10 +121,12 @@ void set_relay_power(bool power) {
 
 /* get status of relays */
 String get_relay_status() {
-  /* correct internal / external state discrepancy */
+  /* correct discrepancy between internal state and EOC status as read from the pin */
   if (digitalRead(EOC_STATUS_PIN) == HIGH && !RELAYS_POWERED) {
+    debug_message("state discrepancy (EOC=ACTIVE, internal=OFF)");
     RELAYS_POWERED = true;
   } else if (digitalRead(EOC_STATUS_PIN) == LOW && RELAYS_POWERED) {
+    debug_message("state discrepancy (EOC=OFF, internal=ACTIVE)");
     RELAYS_POWERED = false;
   }
 
