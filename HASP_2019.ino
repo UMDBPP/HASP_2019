@@ -43,7 +43,7 @@ void loop() {
   current_millis = millis();
 
   /* read the serial buffer and see if anything has come in since the last iteration */
-  if (Serial.available() > 0) {
+  if (Serial.available() >= 7) {
     char incoming_command = read_packet();
 
     /* perform task given a char command code */
@@ -105,20 +105,20 @@ char read_packet() {
   char output;
   
   byte bin = 0;
-  byte third_byte = 0;
-  byte fourth_byte = 0;
+  byte first_data_byte = 0;
+  byte second_data_byte = 0;
 
   if (Serial.available() > 0) {
     bin = Serial.read();
     bin = Serial.read();
-    third_byte = Serial.read();
-    fourth_byte = Serial.read();
+    first_data_byte = Serial.read();
+    second_data_byte = Serial.read();
     bin = Serial.read();
     bin = Serial.read();
     bin = Serial.read();
   }
 
-  switch (fourth_byte) {
+  switch (second_data_byte) {
     case 0x65:
       output = 'A';
     case 0x68:
