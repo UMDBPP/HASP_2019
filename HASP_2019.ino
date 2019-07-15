@@ -44,7 +44,17 @@ void loop() {
 
   /* read the serial buffer and see if anything has come in since the last iteration */
   if (Serial.available() > 0) {
-    char incoming_command = Serial.read();
+    byte header[2];
+    Serial.readBytes(header, 2);
+
+    char incoming_data[2];
+    Serial.readBytes(incoming_data, 2);
+
+    byte footer[2];
+    Serial.readBytes(footer, 2);
+
+    char incoming_command = incoming_data[1];
+    
     /* perform task given a char command code */
     switch (incoming_command) {
       case COMMAND_REQUEST_STATUS:
