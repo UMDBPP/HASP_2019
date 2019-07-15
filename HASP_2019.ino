@@ -44,20 +44,8 @@ void loop() {
 
   /* read the serial buffer and see if anything has come in since the last iteration */
   if (Serial.available() > 0) {
-    /* read in header bytes of packet structure */
-    byte header[2];
-    Serial.readBytes(header, 2);
+    char incoming_command = read_packet();
 
-    /* read in transmitted data payload as character values */
-    char incoming_data[2];
-    Serial.readBytes(incoming_data, 2);
-
-    /* read in footer bytes of packet structure */
-    byte footer[3];
-    Serial.readBytes(footer, 3);
-
-    char incoming_command = incoming_data[1];
-    
     /* perform task given a char command code */
     switch (incoming_command) {
       case COMMAND_REQUEST_STATUS:
@@ -112,6 +100,38 @@ void loop() {
   }
 }
 
+/* read the fourth byte of a 7-byte packet */
+char read_packet() {
+  char output;
+  
+  byte bin = 0;
+  byte third_byte = 0;
+  byte fourth_byte = 0;
+
+  if (Serial.available() > 0) {
+    bin = Serial.read();
+    bin = Serial.read();
+    third_byte = Serial.read();
+    fourth_byte = Serial.read();
+    bin = Serial.read();
+    bin = Serial.read();
+    bin = Serial.read();
+  }
+
+  switch (fourth_byte) {
+    case 0x65:
+      output = 'A';
+    case 0x68:
+      output = 'D';
+    case 0x84:
+      output = 'T';
+    case 0x80:
+      output = 'P';
+  }
+
+  return output;
+}
+
 /* control power to relays */
 void set_relay_power(bool power) {
   if (power) {
@@ -156,8 +176,8 @@ void debug_message(String message) {
 }
 
 /* clear the serial buffer */
-void flush_serial(){
-  while(Serial.available() > 0) {
+void flush_serial() {
+  while (Serial.available() > 0) {
     char _ = Serial.read();
   }
-}   
+}
