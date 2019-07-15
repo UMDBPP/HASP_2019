@@ -8,10 +8,9 @@
 #define ARMING_TIMEOUT_SECONDS 30
 
 /* pin numbers */
-#define EOC_RELAY_PIN 10
-#define CVA_RELAY_PIN_1 11
-#define CVA_RELAY_PIN_2 12
-#define EOC_STATUS_PIN 13
+#define EOC_RELAY_PIN 11
+#define CVA_RELAY_PIN_1 12
+#define CVA_RELAY_PIN_2 13
 
 /* incoming serial messages */
 #define COMMAND_REQUEST_STATUS 'P'
@@ -36,7 +35,6 @@ void setup() {
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
-  pinMode(EOC_STATUS_PIN, INPUT);
 
   send_relay_status();
 }
@@ -46,15 +44,15 @@ void loop() {
 
   /* read the serial buffer and see if anything has come in since the last iteration */
   if (Serial.available() > 0) {
-    /* read in header bytes */
+    /* read in header bytes of packet structure */
     byte header[2];
     Serial.readBytes(header, 2);
 
-    /* read in transmitted data as char */
+    /* read in transmitted data payload as character values */
     char incoming_data[2];
     Serial.readBytes(incoming_data, 2);
 
-    /* read in header bytes */
+    /* read in footer bytes of packet structure */
     byte footer[3];
     Serial.readBytes(footer, 3);
 
@@ -133,15 +131,6 @@ void set_relay_power(bool power) {
 
 /* get status of relays */
 String get_relay_status() {
-  /* correct discrepancy between internal state and EOC status as read from the pin */
-  if (digitalRead(EOC_STATUS_PIN) == HIGH && !RELAYS_POWERED) {
-    debug_message("state discrepancy (EOC=ACTIVE, internal=OFF)");
-    RELAYS_POWERED = true;
-  } else if (digitalRead(EOC_STATUS_PIN) == LOW && RELAYS_POWERED) {
-    debug_message("state discrepancy (EOC=OFF, internal=ACTIVE)");
-    RELAYS_POWERED = false;
-  }
-
   /* return string indicating relay power state */
   if (RELAYS_POWERED) {
     return "ACTIVE";
@@ -165,3 +154,10 @@ void debug_message(String message) {
     Serial.println(String(current_millis) + ", DEBUG MSG : " + message);
   }
 }
+
+/* clear the serial buffer */
+void flush_serial(){
+  while(Serial.available() > 0) {
+    char _ = Serial.read();
+  }
+}   

@@ -12,6 +12,7 @@ from serial.tools import list_ports
 SERIAL_PORT = None
 BAUD_RATE = 1200
 
+HASP_PACKET_STRUCTURE = (0x01, 0x30, None, None, 0x03, 0x0D, 0x0A)
 
 class TestHASPSerial(unittest.TestCase):
     def test_status(self):
