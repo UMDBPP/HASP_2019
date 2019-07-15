@@ -11,6 +11,7 @@
 #define EOC_RELAY_PIN 10
 #define CVA_RELAY_PIN_1 11
 #define CVA_RELAY_PIN_2 12
+#define EOC_STATUS_PIN 13
 
 /* incoming serial messages */
 #define COMMAND_REQUEST_STATUS 'P'
@@ -35,6 +36,7 @@ void setup() {
   pinMode(EOC_RELAY_PIN, OUTPUT);
   pinMode(CVA_RELAY_PIN_1, OUTPUT);
   pinMode(CVA_RELAY_PIN_2, OUTPUT);
+  pinMode(EOC_STATUS_PIN, INPUT);
 
   send_relay_status();
 }
@@ -44,14 +46,17 @@ void loop() {
 
   /* read the serial buffer and see if anything has come in since the last iteration */
   if (Serial.available() > 0) {
+    /* read in header bytes */
     byte header[2];
     Serial.readBytes(header, 2);
 
+    /* read in transmitted data as char */
     char incoming_data[2];
     Serial.readBytes(incoming_data, 2);
 
-    byte footer[2];
-    Serial.readBytes(footer, 2);
+    /* read in header bytes */
+    byte footer[3];
+    Serial.readBytes(footer, 3);
 
     char incoming_command = incoming_data[1];
     
@@ -128,6 +133,16 @@ void set_relay_power(bool power) {
 
 /* get status of relays */
 String get_relay_status() {
+  /* correct discrepancy between internal state and EOC status as read from the pin */
+  if (digitalRead(EOC_STATUS_PIN) == HIGH && !RELAYS_POWERED) {
+    debug_message("state discrepancy (EOC=ACTIVE, internal=OFF)");
+    RELAYS_POWERED = true;
+  } else if (digitalRead(EOC_STATUS_PIN) == LOW && RELAYS_POWERED) {
+    debug_message("state discrepancy (EOC=OFF, internal=ACTIVE)");
+    RELAYS_POWERED = false;
+  }
+
+  /* return string indicating relay power state */
   if (RELAYS_POWERED) {
     return "ACTIVE";
   } else if (RELAY_TRIGGERS_ARMED) {
