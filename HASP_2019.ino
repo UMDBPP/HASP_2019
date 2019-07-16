@@ -18,7 +18,7 @@
 #define COMMAND_DISARM 'D'
 #define COMMAND_ACTIVATE_RELAYS 'T'
 
-/* baud rate of HASP serial interface */
+/* HASP serial specifications */
 #define HASP_BAUD_RATE 1200
 #define HASP_PACKET_LENGTH 7
 
