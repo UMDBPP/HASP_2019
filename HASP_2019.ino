@@ -19,7 +19,7 @@
 #define COMMAND_DISARM 'D'
 #define COMMAND_ACTIVATE_RELAYS 'T'
 
-/* baud rate of HASP serial interface */
+/* HASP serial specifications */
 #define HASP_BAUD_RATE 1200
 #define HASP_PACKET_LENGTH 7
 
@@ -47,6 +47,7 @@ void loop() {
 
   /* check if a packet has come in over serial */
   if (Serial.available() >= HASP_PACKET_LENGTH) {
+    debug_message("received packet");
     char incoming_command = read_packet();
 
     /* perform task given a char command code */
@@ -81,6 +82,7 @@ void loop() {
           debug_message("relays are already on");
         } else if (RELAY_TRIGGERS_ARMED) {
           set_relay_power(true);
+          RELAY_TRIGGERS_ARMED = false;
         } else {
           debug_message("relay triggers are not armed");
         }
@@ -89,13 +91,14 @@ void loop() {
     }
   } else if (Serial.available() < HASP_PACKET_LENGTH) {
     /* clear the serial buffer to remove a partial packet */
+    debug_message("received partial packet - clearing input buffer");
     while (Serial.available() > 0) {
       byte _ = Serial.read();
     }
   }
 
   /* disarm relay triggers if the time since arming exceeds the timeout */
-  if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= (unsigned long) ARMING_TIMEOUT_SECONDS * 1000)) {
+  if (RELAY_TRIGGERS_ARMED && (current_millis - arming_millis >= (unsigned long) ARMING_TIMEOUT_SECONDS * 1000)) {
     debug_message("disarming relay triggers due to timeout");
     RELAY_TRIGGERS_ARMED = false;
     send_relay_status();
@@ -103,6 +106,7 @@ void loop() {
 
   /* send status if the time since the last status update exceeds the interval */
   if (current_millis - previous_status_update_millis >= (unsigned long) STATUS_UPDATE_INTERVAL_SECONDS * 1000) {
+    debug_message("sending automatic status update");
     previous_status_update_millis = current_millis;
     send_relay_status();
   }
