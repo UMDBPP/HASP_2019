@@ -93,7 +93,7 @@ void loop() {
   }
 
   /* disarm relay triggers if the time since arming exceeds the timeout */
-  if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
+  if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= (unsigned long) ARMING_TIMEOUT_SECONDS * 1000)) {
     debug_message("disarming relay triggers due to timeout");
     RELAY_TRIGGERS_ARMED = false;
     send_relay_status();
