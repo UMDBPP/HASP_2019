@@ -45,6 +45,7 @@ void loop() {
 
   /* check if a packet has come in over serial */
   if (Serial.available() >= HASP_PACKET_LENGTH) {
+    debug_message("received packet");
     char incoming_command = read_packet();
 
     /* perform task given a char command code */
