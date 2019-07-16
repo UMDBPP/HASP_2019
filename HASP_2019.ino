@@ -88,6 +88,7 @@ void loop() {
     }
   } else if (Serial.available() < HASP_PACKET_LENGTH) {
     /* clear the serial buffer to remove a partial packet */
+    debug_message("received partial packet - clearing input buffer");
     while (Serial.available() > 0) {
       byte _ = Serial.read();
     }
@@ -102,6 +103,7 @@ void loop() {
 
   /* send status if the time since the last status update exceeds the interval */
   if (current_millis - previous_status_update_millis >= (unsigned long) STATUS_UPDATE_INTERVAL_SECONDS * 1000) {
+    debug_message("sending automatic status update");
     previous_status_update_millis = current_millis;
     send_relay_status();
   }
