@@ -20,6 +20,7 @@
 
 /* baud rate of HASP serial interface */
 #define HASP_BAUD_RATE 1200
+#define HASP_PACKET_LENGTH 7
 
 /* global variables */
 unsigned long current_millis = 0;
@@ -42,8 +43,8 @@ void setup() {
 void loop() {
   current_millis = millis();
 
-  /* read the serial buffer and see if anything has come in since the last iteration */
-  if (Serial.available() >= 7) {
+  /* check if a packet has come in over serial */
+  if (Serial.available() >= HASP_PACKET_LENGTH) {
     char incoming_command = read_packet();
 
     /* perform task given a char command code */
@@ -84,26 +85,31 @@ void loop() {
         send_relay_status();
         break;
     }
-  } else {
-    /* disarm relay triggers if the time since arming exceeds the timeout */
-    if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
-      debug_message("disarming relay triggers due to timeout");
-      RELAY_TRIGGERS_ARMED = false;
-      send_relay_status();
+  } else if (Serial.available() < HASP_PACKET_LENGTH) {
+    /* clear the serial buffer to remove a partial packet */
+    while (Serial.available() > 0) {
+      byte _ = Serial.read();
     }
+  }
 
-    /* send status if the time since the last status update exceeds the interval */
-    if (current_millis - previous_status_update_millis >= (unsigned long) STATUS_UPDATE_INTERVAL_SECONDS * 1000) {
-      previous_status_update_millis = current_millis;
-      send_relay_status();
-    }
+  /* disarm relay triggers if the time since arming exceeds the timeout */
+  if (RELAY_TRIGGERS_ARMED && !RELAYS_POWERED && (current_millis - arming_millis >= ARMING_TIMEOUT_SECONDS * 1000)) {
+    debug_message("disarming relay triggers due to timeout");
+    RELAY_TRIGGERS_ARMED = false;
+    send_relay_status();
+  }
+
+  /* send status if the time since the last status update exceeds the interval */
+  if (current_millis - previous_status_update_millis >= (unsigned long) STATUS_UPDATE_INTERVAL_SECONDS * 1000) {
+    previous_status_update_millis = current_millis;
+    send_relay_status();
   }
 }
 
 /* read the fourth byte of a 7-byte packet */
 char read_packet() {
   char output;
-  
+
   byte bin = 0;
   byte first_data_byte = 0;
   byte second_data_byte = 0;
@@ -172,12 +178,5 @@ void send_relay_status() {
 void debug_message(String message) {
   if (VERBOSE) {
     Serial.println(String(current_millis) + ", DEBUG MSG : " + message);
-  }
-}
-
-/* clear the serial buffer */
-void flush_serial() {
-  while (Serial.available() > 0) {
-    char _ = Serial.read();
   }
 }
