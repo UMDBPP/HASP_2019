@@ -1,5 +1,7 @@
 # HASP_2019
 
+[![Build Status](https://travis-ci.org/UMDBPP/HASP_2019.svg?branch=master)](https://travis-ci.org/UMDBPP/HASP_2019)
+
 ### University of Maryland Balloon Payload Program
 
 The [High Altitude Student Platform](https://laspace.lsu.edu/hasp/) is a project run in conjuction with NASA and LSU to send student research payloads into the upper atmosphere on a floating flight profile.
