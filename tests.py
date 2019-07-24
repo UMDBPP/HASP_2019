@@ -79,7 +79,7 @@ def next_open_port() -> str:
 
 
 if __name__ == '__main__':
-    if SERIAL_PORT is not None:
+    if SERIAL_PORT is None:
         SERIAL_PORT = sys.argv[1] if len(sys.argv) > 1 else next_open_port()
 
     unittest.main()
