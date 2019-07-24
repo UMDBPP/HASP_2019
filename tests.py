@@ -19,39 +19,41 @@ class TestHASPSerial(unittest.TestCase):
                            timeout=1) as serial_connection:
             # validate that the status request command will return the status
             send_packet(serial_connection, b'P')
-            assert 'DAS status: OFF' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: OFF' in read_serial(serial_connection)
 
     def test_arming(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the arming command arms a disarmed system
             send_packet(serial_connection, b'A')
-            assert 'DAS status: ARMED' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: ARMED' in read_serial(serial_connection)
 
             # validate that the disarming command disarms an armed system
             send_packet(serial_connection, b'D')
-            assert 'DAS status: OFF' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: OFF' in read_serial(serial_connection)
 
     def test_disarmed_activation(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command does not activate a disarmed system
             send_packet(serial_connection, b'T')
-            assert 'DAS status: OFF' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: OFF' in read_serial(serial_connection)
 
     def test_activation(self):
         with serial.Serial(port=SERIAL_PORT, baudrate=BAUD_RATE, parity=serial.PARITY_NONE, bytesize=serial.EIGHTBITS,
                            timeout=1) as serial_connection:
             # validate that the activation command activates an armed system
             send_packet(serial_connection, b'AT')
-            assert 'DAS status: ACTIVE' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: ACTIVE' in read_serial(serial_connection)
 
             # validate that the disarming command deactivates an active system
             send_packet(serial_connection, b'D')
-            assert 'DAS status: OFF' in str(serial_connection.readlines()[-1], encoding='ASCII')
+            assert 'DAS status: OFF' in read_serial(serial_connection)
 
 
 def send_packet(serial_connection: serial.Serial, data: bytes):
+    """send a byte message over the serial connection using the HASP packet structure"""
+
     for packet_byte in (0x01, 0x30, None, None, 0x03, 0x0D, 0x0A):
         if packet_byte is None:
             if len(data) == 1:
@@ -65,6 +67,8 @@ def send_packet(serial_connection: serial.Serial, data: bytes):
 
 
 def open_ports() -> str:
+    """iterate over available ports"""
+
     for com_port in serial.tools.list_ports.comports():
         yield com_port.device
     else:
@@ -72,10 +76,18 @@ def open_ports() -> str:
 
 
 def next_open_port() -> str:
+    """get the first available port from the list"""
+
     try:
         return next(open_ports())
     except StopIteration:
         raise OSError('No open serial ports.')
+
+
+def read_serial(serial_connection: serial.Serial) -> str:
+    """read the most recent incoming message from the serial connection"""
+
+    return str(serial_connection.readlines()[-1], encoding='ASCII')
 
 
 if __name__ == '__main__':
